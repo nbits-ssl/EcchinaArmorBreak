@@ -8,11 +8,14 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
 		return
 	endif
 
-	GotoState("Busy")
-	
-	if (Utility.RandomInt() > EABRate.GetValue())
+	int rnd = Utility.RandomInt()
+	int rate = EABRate.GetValue() as int
+	; self.log(rnd + ", " + rate)
+	if (rnd > rate)
 		return
 	endif
+	
+	GotoState("Busy")
 	
 	PreSource = akSource
 	Actor selfact = self.GetActorRef()
