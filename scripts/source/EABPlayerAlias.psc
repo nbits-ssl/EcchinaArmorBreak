@@ -19,18 +19,21 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
 	
 	PreSource = akSource
 	Actor selfact = self.GetActorRef()
-
-	int rndintRP = Utility.RandomInt()
-	int rndintAB = Utility.RandomInt()
+    Int CurrentArmorSlotsMaskB = Math.LeftShift(EABSlotMaskB.GetValue() As Int, 24)
+	Int CurrentArmorSlotsMaskA = EABSlotMask.GetValue() As Int
+	int slotsChecked = Math.LogicalOr(CurrentArmorSlotsMaskA, CurrentArmorSlotsMaskB)
 	
+;	int slotsChecked = EABSlotMask.GetValue() As Int
+
 	Form[] armors = Ecchina_Utility.GetEeuippedArmors(selfact)
 
 	if (armors)
 		int idx = Utility.RandomInt(0, armors.Length - 1)
 		Form targetItem = armors[idx]
-		if (targetItem.HasKeyWord(ArmorClothing) || targetItem.HasKeyWord(ArmorHeavy) || targetItem.HasKeyWord(ArmorLight) || \
-			(EABEnableJewelry.GetValue() == 1 && targetItem.HasKeyWord(ArmorJewelry)))
-			
+		Armor amr = targetItem as Armor
+		int slotmask = amr.GetSlotMask()
+		int slotmaskb = Math.LogicalAnd(slotsChecked, slotmask)
+		if ((slotmaskb != 0x00) && (slotmask == slotmaskb))
 			if (EABBreakMode.GetValue() == 1)
 				selfact.UnEquipItem(targetItem)
 			else
@@ -55,11 +58,7 @@ Function log(String msg)
 	debug.trace("[EAB] " + msg)
 EndFunction
 
-Keyword Property ArmorClothing  Auto  
-Keyword Property ArmorHeavy  Auto  
-Keyword Property ArmorLight  Auto  
-Keyword Property ArmorJewelry  Auto  
-
 GlobalVariable Property EABBreakMode  Auto  
-GlobalVariable Property EABEnableJewelry  Auto  
 GlobalVariable Property EABRate  Auto  
+GlobalVariable Property EABSlotMask  Auto  
+GlobalVariable Property EABSlotMaskB  Auto  
